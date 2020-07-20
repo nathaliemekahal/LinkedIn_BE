@@ -3,6 +3,13 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const server = express();
+const listEndpoints = require("express-list-endpoints");
+const profilesRouter = require("./profiles/index") 
+const {
+  notFoundHandler,
+  badRequestHandler,
+  genericErrorHandler,
+} = require("./errorHandlers")
 
 dotenv.config();
 
@@ -10,6 +17,14 @@ const port = process.env.PORT;
 server.use(express.json());
 
 server.use(cors());
+
+server.use("/profiles", profilesRouter)
+
+server.use(badRequestHandler)
+server.use(notFoundHandler)
+server.use(genericErrorHandler)
+
+console.log(listEndpoints(server));
 
 mongoose
   .connect("mongodb://localhost:27017/LinkedIn", {
