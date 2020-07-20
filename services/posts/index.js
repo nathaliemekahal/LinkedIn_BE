@@ -16,8 +16,11 @@ router.get("/", async (req, res) => {
 // GET a specific post
 
 router.get("/:id", async (req, res) => {
-  const post = await postModel.findById(req.params.id);
-  res.send(post);
+  postModel.findById(req.params.id, function (err, post) {
+    res.set("Content-Type", post.image.contentType);
+    console.log(post);
+    res.send(post.image.data);
+  });
 });
 
 //POST a post
@@ -40,18 +43,15 @@ router.post("/:id", upload.single("image"), async (req, res) => {
 
   //
   var obj = {
-    image: {
-      data: fs.readFileSync(
-        path.join(
-          __dirname +
-            "/images/" +
-            req.params.id +
-            "." +
-            req.file.originalname.split(".").pop()
-        )
-      ),
-      contentType: "image/png",
-    },
+    image: fs.readFileSync(
+      path.join(
+        __dirname +
+          "/images/" +
+          req.params.id +
+          "." +
+          req.file.originalname.split(".").pop()
+      )
+    ),
   };
   //
 
