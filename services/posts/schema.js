@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-
+const ProfilesModel = require("../profiles/schema");
 const postSchema = new Schema(
   {
     text: {
@@ -11,6 +11,7 @@ const postSchema = new Schema(
       data: Buffer,
       contentType: String,
     },
+    user: ProfilesModel.schema,
   },
   { timestamps: true }
 );
