@@ -2,6 +2,10 @@ const express = require("express");
 const q2m = require("query-to-mongo");
 const ExperienceModel = require("./schema");
 const e = require("express");
+const multer = require("multer");
+const upload = multer({});
+const fs = require("fs-extra");
+const path = require("path");
 
 const experienceRoute = express.Router();
 
@@ -45,5 +49,35 @@ experienceRoute.delete("/:id", async (req, res) => {
     console.log(error);
   }
 });
+experienceRoute.post("/:id", upload.single("image"), async (req, res) => {
+  const imagesPath = path.join(__dirname, "/images");
+  await fs.writeFile(
+    path.join(
+      imagesPath,
+      req.params.id + "." + req.file.originalname.split(".").pop()
+    ),
+    req.file.buffer
+  );
 
+  //
+  var obj = {
+    image: {
+      data: fs.readFileSync(
+        path.join(
+          __dirname +
+            "/images/" +
+            req.params.id +
+            "." +
+            req.file.originalname.split(".").pop()
+        )
+      ),
+      contentType: "image/png",
+    },
+  };
+  //
+
+  await ExperienceModel.findByIdAndUpdate(req.params.id, obj);
+  res.send("image added successfully");
+});
+experienceRoute.post("");
 module.exports = experienceRoute;
