@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const postsRoutes = require("./posts");
+
 const server = express();
 
 dotenv.config();
@@ -10,6 +12,7 @@ const port = process.env.PORT;
 server.use(express.json());
 
 server.use(cors());
+server.use("/posts", postsRoutes);
 
 mongoose
   .connect("mongodb://localhost:27017/LinkedIn", {
