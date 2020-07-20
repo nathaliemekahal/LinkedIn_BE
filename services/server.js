@@ -3,15 +3,16 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const postsRoutes = require("./posts");
+const experienceRoute = require("./experience");
 
 const server = express();
 const listEndpoints = require("express-list-endpoints");
-const profilesRouter = require("./profiles/index") 
+const profilesRouter = require("./profiles/index");
 const {
   notFoundHandler,
   badRequestHandler,
   genericErrorHandler,
-} = require("./errorHandlers")
+} = require("./errorHandlers");
 
 dotenv.config();
 
@@ -20,24 +21,27 @@ server.use(express.json());
 
 server.use(cors());
 server.use("/posts", postsRoutes);
+server.use("/experience", experienceRoute);
+server.use("/profiles", profilesRouter);
 
-server.use("/profiles", profilesRouter)
-
-server.use(badRequestHandler)
-server.use(notFoundHandler)
-server.use(genericErrorHandler)
+server.use(badRequestHandler);
+server.use(notFoundHandler);
+server.use(genericErrorHandler);
 
 console.log(listEndpoints(server));
 
+const uri =
+  "mongodb+srv://natman:feet@cluster0.z2kek.mongodb.net/Cluster0?retryWrites=true&w=majority";
 mongoose
-  .connect("mongodb://localhost:27017/LinkedIn", {
+  .connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true,
   })
   .then(
     server.listen(port, () => {
-      console.log("Running on port", port);
+      console.log(`working on port${port}`);
     })
-  )
-  .catch((err) => console.log(err));
+  );
+mongoose.connection.on("connected", () => {
+  console.log("connected to atlas");
+});
