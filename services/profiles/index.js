@@ -42,7 +42,7 @@ profilesRouter.post("/", async (req, res, next) => {
     }    
 })
 
-profilesRouter.put("/id", async (req, res, next) => {
+profilesRouter.put("/:id", async (req, res, next) => {
     try {
         const profile = await ProfilesSchema.findOneAndUpdate(req.params.id, req.body)
         if(profile){
@@ -57,7 +57,7 @@ profilesRouter.put("/id", async (req, res, next) => {
     }    
 })
 
-profilesRouter.delete("/id", async (req, res, next) => {
+profilesRouter.delete("/:id", async (req, res, next) => {
     try {
         const profile = await ProfilesSchema.findByIdAndDelete(req.params.id)
         if(profile){
