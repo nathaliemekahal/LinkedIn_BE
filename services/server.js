@@ -4,15 +4,14 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const postsRoutes = require("./posts");
 
-const experienceRoute = require("./Routes/Experience");
 const server = express();
 const listEndpoints = require("express-list-endpoints");
-const profilesRouter = require("./profiles/index");
+const profilesRouter = require("./profiles/index") 
 const {
   notFoundHandler,
   badRequestHandler,
   genericErrorHandler,
-} = require("./errorHandlers");
+} = require("./errorHandlers")
 
 dotenv.config();
 
@@ -22,15 +21,14 @@ server.use(express.json());
 server.use(cors());
 server.use("/posts", postsRoutes);
 
-server.use("/profiles", profilesRouter);
+server.use("/profiles", profilesRouter)
 
-server.use(badRequestHandler);
-server.use(notFoundHandler);
-server.use(genericErrorHandler);
+server.use(badRequestHandler)
+server.use(notFoundHandler)
+server.use(genericErrorHandler)
 
 console.log(listEndpoints(server));
 
-server.use("/experience", experienceRoute);
 mongoose
   .connect("mongodb://localhost:27017/LinkedIn", {
     useNewUrlParser: true,
