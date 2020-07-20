@@ -1,6 +1,10 @@
 const express = require("express")
 const ProfilesSchema = require("./schema")
 const profilesRouter = express.Router()
+const multer = require("multer")
+const fs = require("fs-extra")
+const path = require("path")
+const upload = multer({});
 
 profilesRouter.get("/", async (req, res, next) => {
     try {
@@ -27,6 +31,36 @@ profilesRouter.get("/:id", async (req, res, next) => {
         next("While reading profiles list a problem occurred!")        
     }    
 })
+
+profilesRouter.post("/:id", upload.single("image"), async (req, res) => {
+    const imagesPath = path.join(__dirname, "/images");
+    await fs.writeFile(
+      path.join(
+        imagesPath,
+        req.params.id + "." + req.file.originalname.split(".").pop()
+      ),
+      req.file.buffer
+    );
+  
+    //
+    var obj = {
+      image: {
+        data: fs.readFileSync(
+          path.join(
+            __dirname +
+              "/images/" +
+              req.params.id +
+              "." +
+              req.file.originalname.split(".").pop()
+          )
+        ),
+        contentType: "image/png",
+      },
+    };
+    //  
+    await ProfilesSchema.findByIdAndUpdate(req.params.id, obj);
+    res.send("image added successfully");
+});
 
 profilesRouter.post("/", async (req, res, next) => {
     try {
