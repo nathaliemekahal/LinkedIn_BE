@@ -7,6 +7,9 @@ const upload = multer({});
 const fs = require("fs-extra");
 const path = require("path");
 const v = require("validator");
+const json2csv = require("json2csv");
+
+const pump = require("pump");
 const experienceRoute = express.Router();
 
 experienceRoute.post("/", async (req, res) => {
@@ -16,11 +19,35 @@ experienceRoute.post("/", async (req, res) => {
 
   res.status(201).send("ok");
 });
+experienceRoute.get("/export/csv/:id", async (req, res, next) => {
+  // try {
+
+  console.log("here");
+  const id = req.params.id;
+  const experience = await ExperienceModel.find({ _id: req.params.id });
+
+  const fields = [
+    "_id",
+    "role",
+    "company",
+    "startDate",
+    "endDate",
+    "description",
+    "area",
+    "username",
+    "createdAt",
+    "updatedAt",
+  ];
+  const csv = await json2csv.parse(experience, fields);
+  // res.setHeader("Content-Disposition", "attachment; filename=export.csv");
+  res.send(csv);
+});
 
 experienceRoute.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const experience = await ExperienceModel.findById(id);
+
     res.send(experience);
   } catch (error) {
     console.log(error);
@@ -79,5 +106,6 @@ experienceRoute.post("/:id", upload.single("image"), async (req, res) => {
   await ExperienceModel.findByIdAndUpdate(req.params.id, obj);
   res.send("image added successfully");
 });
+
 experienceRoute.post("");
 module.exports = experienceRoute;

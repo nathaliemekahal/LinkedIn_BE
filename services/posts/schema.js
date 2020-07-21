@@ -11,6 +11,10 @@ const postSchema = new Schema(
       data: Buffer,
       contentType: String,
     },
+<<<<<<< Updated upstream
+=======
+    user: ProfilesModel.schema,
+>>>>>>> Stashed changes
   },
   { timestamps: true }
 );
