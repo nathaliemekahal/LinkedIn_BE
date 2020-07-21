@@ -5,7 +5,10 @@ const multer = require("multer")
 const fs = require("fs-extra")
 const path = require("path")
 const upload = multer({});
+const PDFDocument = require('pdfkit')
 
+
+// Get all profiles
 profilesRouter.get("/", async (req, res, next) => {
     try {
         const profiles = await ProfilesSchema.find(req.query)
@@ -15,6 +18,7 @@ profilesRouter.get("/", async (req, res, next) => {
     }
 })
 
+// Get single profile
 profilesRouter.get("/:id", async (req, res, next) => {
     try {
         const id = req.params.id
@@ -32,6 +36,7 @@ profilesRouter.get("/:id", async (req, res, next) => {
     }    
 })
 
+// Post a new image for a profile
 profilesRouter.post("/:id", upload.single("image"), async (req, res) => {
     const imagesPath = path.join(__dirname, "/images");
     await fs.writeFile(
@@ -62,6 +67,7 @@ profilesRouter.post("/:id", upload.single("image"), async (req, res) => {
     res.send("image added successfully");
 });
 
+// Post a new profile
 profilesRouter.post("/", async (req, res, next) => {
     try {
         const newProfile = {
@@ -76,6 +82,10 @@ profilesRouter.post("/", async (req, res, next) => {
     }    
 })
 
+// Create a PDF file of a profile
+
+
+// Modifie a profile
 profilesRouter.put("/:id", async (req, res, next) => {
     try {
         const profile = await ProfilesSchema.findOneAndUpdate(req.params.id, req.body)
@@ -91,6 +101,7 @@ profilesRouter.put("/:id", async (req, res, next) => {
     }    
 })
 
+// Delete a profile
 profilesRouter.delete("/:id", async (req, res, next) => {
     try {
         const profile = await ProfilesSchema.findByIdAndDelete(req.params.id)
