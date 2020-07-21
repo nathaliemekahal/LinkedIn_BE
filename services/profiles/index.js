@@ -99,7 +99,7 @@ profilesRouter.get("/profilePDF/:id", async (req, res, next) => {
                 //line to the middle
                 doc
                   .moveTo(270, 90)
-                  .lineTo(270, 190)
+                  .lineTo(270, 210)
                   .stroke()
                 
                 row(doc,  90);
@@ -107,18 +107,21 @@ profilesRouter.get("/profilePDF/:id", async (req, res, next) => {
                 row(doc, 130);
                 row(doc, 150);
                 row(doc, 170);
+                row(doc, 190);
                 
                 textInRowFirst(doc, "Name:", 100)
                 textInRowFirst(doc, "Surname", 120);
                 textInRowFirst(doc, "Email", 140);
                 textInRowFirst(doc, "Area", 160);
                 textInRowFirst(doc, "Username", 180);
+                textInRowFirst(doc, "Bio", 200);
 
                 textInRowSecond(doc, profile.name, 100)
                 textInRowSecond(doc, profile.surname, 120)
                 textInRowSecond(doc, profile.email, 140)
                 textInRowSecond(doc, profile.area, 160)
                 textInRowSecond(doc, profile.username, 180)
+                textInRowSecond(doc, profile.bio, 200)
                 doc.end();
                 
                 writeStream.on('finish', function () {
