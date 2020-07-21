@@ -83,6 +83,94 @@ profilesRouter.post("/", async (req, res, next) => {
 })
 
 // Create a PDF file of a profile
+profilesRouter.get("/profilePDF/:id", async (req, res, next) => {
+
+    try {
+        console.log('here')
+        const id = req.params.id
+        const profile = await ProfilesSchema.findById(id)
+       
+            console.log(profile)
+            function example(){    
+                var doc = new PDFDocument();
+                
+                var writeStream = fs.createWriteStream(`${profile.username}.pdf`);
+                doc.pipe(writeStream);
+                //line to the middle
+                doc
+                  .moveTo(270, 90)
+                  .lineTo(270, 190)
+                  .stroke()
+                
+                row(doc,  90);
+                row(doc, 110);
+                row(doc, 130);
+                row(doc, 150);
+                row(doc, 170);
+                
+                textInRowFirst(doc, "Name:", 100)
+                textInRowFirst(doc, "Surname", 120);
+                textInRowFirst(doc, "Email", 140);
+                textInRowFirst(doc, "Area", 160);
+                textInRowFirst(doc, "Username", 180);
+
+                textInRowSecond(doc, profile.name, 100)
+                textInRowSecond(doc, profile.surname, 120)
+                textInRowSecond(doc, profile.email, 140)
+                textInRowSecond(doc, profile.area, 160)
+                textInRowSecond(doc, profile.username, 180)
+                doc.end();
+                
+                writeStream.on('finish', function () {
+                  // do stuff with the PDF file
+                  return res.status(200).json({
+                    ok: "ok"
+                  });
+                
+                });
+                }
+                
+                function textInRowFirst(doc, text, heigth) {
+                  doc.y = heigth;
+                  doc.x = 30;
+                  doc.fillColor('black')
+                  doc.text(text, {
+                    paragraphGap: 5,
+                    indent: 5,
+                    align: 'justify',
+                    columns: 1,
+                  });
+                  return doc
+                }
+
+                function textInRowSecond(doc, text, heigth) {
+                    doc.y = heigth;
+                    doc.x = 270;
+                    doc.fillColor('black')
+                    doc.text(text, {
+                      paragraphGap: 5,
+                      indent: 5,
+                      align: 'justify',
+                      columns: 1,
+                    });
+                    return doc
+                  }
+                
+                
+                function row(doc, heigth) {
+                  doc.lineJoin('miter')
+                    .rect(30, heigth, 500, 20)
+                    .stroke()
+                  return doc
+                }
+
+                example()
+           
+    } catch (error) {
+        console.log(error)
+        next("While reading profiles list a problem occurred!")        
+    }
+})
 
 
 // Modifie a profile

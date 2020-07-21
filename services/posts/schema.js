@@ -12,7 +12,7 @@ const postSchema = new Schema(
       data: Buffer,
       contentType: String,
     },
-    user: ProfilesModel.Schema,
+    user: ProfilesModel.schema,
   },
   { timestamps: true }
 );

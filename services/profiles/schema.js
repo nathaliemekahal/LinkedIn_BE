@@ -1,18 +1,4 @@
-/*
-id server generated
-name -> type string, min char 2, required
-surname -> type string, min char 2, required
-email -> type email, min char 5, required
-bio -> not required
-area -> required
-image (server generated)
-username -> required
-createdAt server generated
-updatedAt server generated
-*/
-
-const { Schema } = require("mongoose")
-const mongoose = require("mongoose")
+const { Schema, model } = require("mongoose")
 const v = require("validator")
 
 const ProfilesSchema = new Schema (
@@ -60,5 +46,5 @@ const ProfilesSchema = new Schema (
     {timestamps: true}
 )
 
-const ProfilesModel = mongoose.model("Profiles", ProfilesSchema)
+const ProfilesModel = model("Profiles", ProfilesSchema)
 module.exports = ProfilesModel
