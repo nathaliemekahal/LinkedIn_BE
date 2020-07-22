@@ -19,29 +19,29 @@ experienceRoute.post("/", async (req, res) => {
 
   res.status(201).send("ok");
 });
-experienceRoute.get("/export/csv/:id", async (req, res, next) => {
-  // try {
+// experienceRoute.get("/export/csv/:id", async (req, res, next) => {
+//   // try {
 
-  console.log("here");
-  const id = req.params.id;
-  const experience = await ExperienceModel.find({ _id: req.params.id });
+//   console.log("here");
+//   const id = req.params.id;
+//   const experience = await ExperienceModel.find({ _id: req.params.id });
 
-  const fields = [
-    "_id",
-    "role",
-    "company",
-    "startDate",
-    "endDate",
-    "description",
-    "area",
-    "username",
-    "createdAt",
-    "updatedAt",
-  ];
-  const csv = await json2csv.parse(experience, fields);
-  // res.setHeader("Content-Disposition", "attachment; filename=export.csv");
-  res.send(csv);
-});
+//   const fields = [
+//     "_id",
+//     "role",
+//     "company",
+//     "startDate",
+//     "endDate",
+//     "description",
+//     "area",
+//     "username",
+//     "createdAt",
+//     "updatedAt",
+//   ];
+//   const csv = await json2csv.parse(experience, fields);
+//   // res.setHeader("Content-Disposition", "attachment; filename=export.csv");
+//   res.send(csv);
+// });
 
 experienceRoute.get("/:id", async (req, res) => {
   try {
