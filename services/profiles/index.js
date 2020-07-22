@@ -36,20 +36,22 @@ profilesRouter.get("/:id", async (req, res, next) => {
 });
 
 // Post a new image for a profile
-profilesRouter.post("/:id", upload.single("image"), async (req, res) => {
-  const imagesPath = path.join(__dirname, "/images");
-  await fs.writeFile(
-    path.join(
-      imagesPath,
-      req.params.id + "." + req.file.originalname.split(".").pop()
-    ),
-    req.file.buffer
-  );
+profilesRouter.post(
+  "/:id/uploadImage",
+  upload.single("image"),
+  async (req, res) => {
+    const imagesPath = path.join(__dirname, "/images");
+    await fs.writeFile(
+      path.join(
+        imagesPath,
+        req.params.id + "." + req.file.originalname.split(".").pop()
+      ),
+      req.file.buffer
+    );
 
-  //
-  var obj = {
-    image: {
-      data: fs.readFileSync(
+    //
+    var obj = {
+      image: fs.readFileSync(
         path.join(
           __dirname +
             "/images/" +
@@ -58,13 +60,12 @@ profilesRouter.post("/:id", upload.single("image"), async (req, res) => {
             req.file.originalname.split(".").pop()
         )
       ),
-      contentType: "image/png",
-    },
-  };
-  //
-  await ProfilesSchema.findByIdAndUpdate(req.params.id, obj);
-  res.send("image added successfully");
-});
+    };
+    //
+    await ProfilesSchema.findByIdAndUpdate(req.params.id, obj);
+    res.send("image added successfully");
+  }
+);
 
 // Post a new profile
 profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
