@@ -98,28 +98,44 @@ experienceRoute.get("/:userName/experience", async (req, res) => {
   }
 });
 
-// experienceRoute.put("/:id", async (req, res) => {
-//   const id = req.params.id;
-//   const experience = await ExperienceModel.findByIdAndUpdate(
-//     id,
-//     {
-//       ...req.body,
-//     },
-//     { runValidators: true }
-//   );
-//   if (experience) {
-//     res.send("UPDATED");
-//   }
-// });
+experienceRoute.get("/:userName/experience/:id", async (req, res) => {
+  try {
+    const experience = await ExperienceModel.find({
+      username: req.params.userName,
+      _id: req.params.id,
+    });
 
-// experienceRoute.delete("/:id", async (req, res) => {
-//   try {
-//     await ExperienceModel.findByIdAndDelete(req.params.id);
-//     res.send("deleted");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
+    res.send(experience);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+experienceRoute.put("/:userName/experience/:id", async (req, res) => {
+  const id = req.params.id;
+  const experience = await ExperienceModel.findOneAndUpdate(
+    { username: req.params.userName, _id: req.params.id },
+    {
+      ...req.body,
+    },
+    { runValidators: true }
+  );
+  if (experience) {
+    res.send("UPDATED");
+  }
+});
+
+experienceRoute.delete("/:userName/experience/:id", async (req, res) => {
+  try {
+    await ExperienceModel.findOneAndDelete({
+      _id: req.params.id,
+      username: req.params.userName,
+    });
+    res.send("deleted");
+  } catch (error) {
+    console.log(error);
+  }
+});
 // experienceRoute.post("/:id", upload.single("image"), async (req, res) => {
 //   const imagesPath = path.join(__dirname, "/images");
 //   await fs.writeFile(
