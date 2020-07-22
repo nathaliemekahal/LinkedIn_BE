@@ -5,12 +5,10 @@ const postSchema = new Schema(
   {
     text: {
       type: String,
-      required: true,
     },
     username: String,
     image: {
-      data: Buffer,
-      contentType: String,
+      type: Buffer,
     },
     user: ProfilesModel.schema,
   },
