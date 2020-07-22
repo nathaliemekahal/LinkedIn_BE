@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 const mongoose = require("mongoose");
-const v = require("validator");
 
 const ExperienceSchema = new Schema(
   {
@@ -33,13 +32,12 @@ const ExperienceSchema = new Schema(
       required: true,
     },
     image: {
-      data: Buffer,
-      contentType: String,
+      type: Buffer,
     },
   },
   { timestamps: true }
 );
 
-const ExperienceModel = model("Experience", ExperienceSchema);
+const ExperienceModel = model("experience", ExperienceSchema);
 
 module.exports = ExperienceModel;
