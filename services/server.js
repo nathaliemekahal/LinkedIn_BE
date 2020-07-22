@@ -33,7 +33,7 @@ console.log(listEndpoints(server));
 const uri =
   "mongodb+srv://natman:feet@cluster0.z2kek.mongodb.net/Cluster0?retryWrites=true&w=majority";
 mongoose
-  .connect("mongodb://localhost:27017/LinkedIn", {
+  .connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
