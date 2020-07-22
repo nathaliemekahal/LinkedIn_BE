@@ -11,6 +11,7 @@ const upload = multer({});
 // GET all posts
 router.get("/", async (req, res) => {
   const posts = await postModel.find();
+  //res.set("Content-Type", post.image.contentType);
   res.send(posts);
 });
 
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   postModel.findById(req.params.id, function (err, post) {
-    // res.set("Content-Type", post.image.contentType);
+    //res.set("Content-Type", post.image.contentType);
     console.log(post);
     res.send(post);
   });
@@ -27,14 +28,17 @@ router.get("/:id", async (req, res) => {
 //POST a post
 router.post("/", async (req, res) => {
   const user = await ProfilesModel.findOne({ username: req.headers.user });
-  const post = { ...req.body, user: user, username: req.headers.user };
-  const file = await new postModel(post);
-  console.log(post);
-  console.log(req.headers.user);
-  if (req.headers.user === "user7") {
+  if (user) {
+    const post = { ...req.body, username: req.headers.user, user };
+    const file = await new postModel(post);
+    console.log(post);
+    console.log(user);
     file.save();
+
+    res.send("Posted Successfully");
+  } else {
+    res.send("You need to registered to post");
   }
-  res.send("Posted Successfully");
 });
 
 //POST a image

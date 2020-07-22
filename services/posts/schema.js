@@ -8,7 +8,8 @@ const postSchema = new Schema(
     },
     username: String,
     image: {
-      type: Buffer,
+      data: Buffer,
+      contentType: String,
     },
     user: ProfilesModel.schema,
   },

@@ -24,7 +24,8 @@ const ProfilesSchema = new Schema(
       require: true,
     },
     image: {
-      type: Buffer,
+      data: Buffer,
+      contentType: String,
     },
     username: {
       type: String,
