@@ -90,7 +90,6 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
           )
         ),
       };
-      // console.log(obj);
     } else {
       var obj = {
         ...req.body,

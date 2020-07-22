@@ -64,6 +64,7 @@ router.post("/:id", upload.single("image"), async (req, res) => {
       )
     ),
   };
+  console.log(obj);
   //
 
   await postModel.findByIdAndUpdate(req.params.id, obj);
