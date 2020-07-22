@@ -27,12 +27,13 @@ router.get("/:id", async (req, res) => {
 
 //POST a post
 router.post("/", async (req, res) => {
+  console.log(req.headers.user);
   const user = await ProfilesModel.findOne({ username: req.headers.user });
+  // console.log(user);
   if (user) {
     const post = { ...req.body, username: req.headers.user, user };
     const file = await new postModel(post);
     console.log(post);
-    console.log(user);
     file.save();
 
     res.send("Posted Successfully");
