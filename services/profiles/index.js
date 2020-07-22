@@ -117,7 +117,7 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
 });
 
 // Create a PDF file of a profile
-profilesRouter.get("/profilePDF/:id", async (req, res, next) => {
+profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
   try {
     console.log("here");
     const id = req.params.id;
