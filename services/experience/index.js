@@ -148,6 +148,8 @@ experienceRoute.post(
       ),
       req.file.buffer
     );
+
+    //
     var obj = {
       image: fs.readFileSync(
         path.join(
@@ -159,12 +161,13 @@ experienceRoute.post(
         )
       ),
     };
+
     const experience = await ExperienceModel.findOneAndUpdate(
       {
         $and: [{ _id: req.params.id }, { username: req.params.userName }],
       },
       {
-        $set: { obj },
+        ...obj,
       },
       { new: true }
     );
