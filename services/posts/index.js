@@ -3,6 +3,7 @@ const postModel = require("./schema");
 const multer = require("multer");
 const fs = require("fs-extra");
 const path = require("path");
+const ProfilesModel = require("../profiles/schema");
 
 const router = express.Router();
 const upload = multer({});
@@ -17,16 +18,22 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   postModel.findById(req.params.id, function (err, post) {
-    res.set("Content-Type", post.image.contentType);
+    // res.set("Content-Type", post.image.contentType);
     console.log(post);
-    res.send(post.image.data);
+    res.send(post);
   });
 });
 
 //POST a post
 router.post("/", async (req, res) => {
-  const post = await new postModel(req.body);
-  post.save();
+  const user = await ProfilesModel.findOne({ username: req.headers.user });
+  const post = { ...req.body, user: user, username: req.headers.user };
+  const file = await new postModel(post);
+  console.log(post);
+  console.log(req.headers.user);
+  if (req.headers.user === "user7") {
+    file.save();
+  }
   res.send("Posted Successfully");
 });
 
@@ -40,7 +47,7 @@ router.post("/:id", upload.single("image"), async (req, res) => {
     ),
     req.file.buffer
   );
-
+  console.log(req.file);
   //
   var obj = {
     image: fs.readFileSync(
