@@ -13,13 +13,17 @@ const { Transform } = require("json2csv");
 const pump = require("pump");
 const experienceRoute = express.Router();
 
-// experienceRoute.post("/", async (req, res) => {
-//   const newExperience = new ExperienceModel(req.body);
-//   console.log(newExperience);
-//   await newExperience.save();
+experienceRoute.post("/:userName/experience", async (req, res) => {
+  console.log(req.params.userName);
+  const newExperience = new ExperienceModel({
+    ...req.body,
+    username: req.params.userName,
+  });
+  console.log(newExperience);
+  await newExperience.save();
 
-//   res.status(201).send("ok");
-// });
+  res.status(201).send("ok");
+});
 // experienceRoute.get("/export/csv2/:id", async (req, res, next) => {
 //   try {
 //     const id = req.params.id;

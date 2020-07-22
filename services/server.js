@@ -21,7 +21,7 @@ server.use(express.json());
 
 server.use(cors());
 server.use("/posts", postsRoutes);
-server.use("/profile/", experienceRoute);
+server.use("/profile", experienceRoute);
 server.use("/profile", profilesRouter);
 
 server.use(badRequestHandler);
