@@ -136,36 +136,42 @@ experienceRoute.delete("/:userName/experience/:id", async (req, res) => {
     console.log(error);
   }
 });
-// experienceRoute.post("/:id", upload.single("image"), async (req, res) => {
-//   const imagesPath = path.join(__dirname, "/images");
-//   await fs.writeFile(
-//     path.join(
-//       imagesPath,
-//       req.params.id + "." + req.file.originalname.split(".").pop()
-//     ),
-//     req.file.buffer
-//   );
+experienceRoute.post(
+  "/:userName/experience/:id/image",
+  upload.single("image"),
+  async (req, res) => {
+    const imagesPath = path.join(__dirname, "/images");
+    await fs.writeFile(
+      path.join(
+        imagesPath,
+        req.params.id + "." + req.file.originalname.split(".").pop()
+      ),
+      req.file.buffer
+    );
+    var obj = {
+      image: fs.readFileSync(
+        path.join(
+          __dirname +
+            "/images/" +
+            req.params.id +
+            "." +
+            req.file.originalname.split(".").pop()
+        )
+      ),
+    };
+    const experience = await ExperienceModel.findOneAndUpdate(
+      {
+        $and: [{ _id: req.params.id }, { username: req.params.userName }],
+      },
+      {
+        $set: { obj },
+      },
+      { new: true }
+    );
 
-//   //
-//   var obj = {
-//     image: {
-//       data: fs.readFileSync(
-//         path.join(
-//           __dirname +
-//             "/images/" +
-//             req.params.id +
-//             "." +
-//             req.file.originalname.split(".").pop()
-//         )
-//       ),
-//       contentType: "image/png",
-//     },
-//   };
-//   //
-
-//   await ExperienceModel.findByIdAndUpdate(req.params.id, obj);
-//   res.send("image added successfully");
-// });
+    res.send("IMAGE UPLOADED");
+  }
+);
 
 experienceRoute.post("");
 module.exports = experienceRoute;

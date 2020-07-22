@@ -31,10 +31,9 @@ const ExperienceSchema = new Schema(
       type: String,
       required: true,
     },
-    // image: {
-    //   data: Buffer,
-    //   contentType: String,
-    // },
+    image: {
+      type: Buffer,
+    },
   },
   { timestamps: true }
 );
