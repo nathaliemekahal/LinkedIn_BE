@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "debug": "nodemon --inspect -r dotenv/config ./src/server.js",
+    "debug": "nodemon --inspect -r dotenv/config ./services/server.js",
     "dev": "nodemon ./services/server.js",
-    "start": "node ./src/server.js"
+    "start": "node ./services/server.js"
   },
   "repository": {
     "type": "git",
