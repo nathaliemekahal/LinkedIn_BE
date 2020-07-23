@@ -7,7 +7,7 @@ const upload = multer({});
 const fs = require("fs-extra");
 const path = require("path");
 const v = require("validator");
-const json2csv = require("json2csv");
+const json2csv = require("json2csv").parse;
 const { Transform } = require("json2csv");
 
 const pump = require("pump");
@@ -58,33 +58,35 @@ experienceRoute.post("/:userName/experience", async (req, res) => {
 //     console.log(error);
 //   }
 // });
-// experienceRoute.get("/export/csv/:id", async (req, res, next) => {
-//   // try {
+experienceRoute.get("/export/csv/:userName", async (req, res, next) => {
+  // try {
 
-//   console.log("here");
-//   const id = req.params.id;
-//   const experience = await ExperienceModel.find({ _id: req.params.id });
+  const id = req.params.id;
+  const experience = await ExperienceModel.find({
+    username: req.params.userName,
+  });
 
-//   const fields = [
-//     "_id",
-//     "role",
-//     "company",
-//     "startDate",
-//     "endDate",
-//     "description",
-//     "area",
-//     "username",
-//     "createdAt",
-//     "updatedAt",
-//   ];
-//   const csvString = json2csv(experience);
-//   res.setHeader(
-//     "Content-disposition",
-//     "attachment; filename=shifts-report.csv"
-//   );
-//   res.set("Content-Type", "text/csv");
-//   res.status(200).send(csvString);
-// });
+  const fields = [
+    "_id",
+    "role",
+    "company",
+    "startDate",
+    "endDate",
+    "description",
+    "area",
+    "username",
+    "createdAt",
+    "updatedAt",
+  ];
+  const data = { fields };
+  const csvString = json2csv(experience, data);
+  res.setHeader(
+    "Content-disposition",
+    "attachment; filename=shifts-report.csv"
+  );
+  res.set("Content-Type", "text/csv");
+  res.status(200).send(csvString);
+});
 
 experienceRoute.get("/:userName/experience", async (req, res) => {
   try {
