@@ -21,8 +21,8 @@ server.use(express.json());
 
 server.use(cors());
 server.use("/posts", postsRoutes);
-server.use("/experience", experienceRoute);
-server.use("/profiles", profilesRouter);
+server.use("/profile", experienceRoute);
+server.use("/profile", profilesRouter);
 
 server.use(badRequestHandler);
 server.use(notFoundHandler);
@@ -39,7 +39,7 @@ mongoose
   })
   .then(
     server.listen(port, () => {
-      console.log(`working on port${port}`);
+      console.log(`working on port ${port}`);
     })
   );
 mongoose.connection.on("connected", () => {

@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
     console.log(post);
     file.save();
 
-    res.send("Posted Successfully");
+    res.send(file._id);
   } else {
     res.send("You need to registered to post");
   }

@@ -18,10 +18,10 @@ profilesRouter.get("/", async (req, res, next) => {
 });
 
 // Get single profile
-profilesRouter.get("/:id", async (req, res, next) => {
+profilesRouter.get("/:username", async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const profile = await ProfilesSchema.findById(id);
+    const username = req.params.username;
+    const profile = await ProfilesSchema.find({username: username});
     if (profile) {
       res.status(200).send(profile);
     } else {
@@ -117,7 +117,7 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
 });
 
 // Create a PDF file of a profile
-profilesRouter.get("/profilePDF/:id", async (req, res, next) => {
+profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
   try {
     console.log("here");
     const id = req.params.id;
