@@ -168,20 +168,33 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       textInRowSecond(doc, "German", 160);
 
 
-      // Content of user experiences
-      textInRowFirstExperiences(doc, "Role:", 345);
-      textInRowFirstExperiences(doc, "Company", 365);
-      textInRowFirstExperiences(doc, "Start Date", 385);
-      textInRowFirstExperiences(doc, "End Date", 405);
-      textInRowFirstExperiences(doc, "Description", 425);
-      textInRowFirstExperiences(doc, "Area", 445);
+      const exLineHeight = 345
+      const addSpace = 160
+      const jForLenght = experience.length
 
-      textInRowSecondExperiences(doc, experience[0].role, 345);
-      textInRowSecondExperiences(doc, experience[0].company, 365);
-      textInRowSecondExperiences(doc, experience[0].startDate, 385);
-      textInRowSecondExperiences(doc, experience[0].endDate, 405);
-      textInRowSecondExperiences(doc, experience[0].description, 425);
-      textInRowSecondExperiences(doc, experience[0].area, 445);
+      for(let j=0; j<jForLenght; j++){
+        let LineHeight = exLineHeight
+        for(let i=0; i<2; i++){  
+          // Content of user experiences
+        
+        textInRowFirstExperiences(doc, "Role:", LineHeight); //345
+        textInRowFirstExperiences(doc, "Company", LineHeight+20); //365
+        textInRowFirstExperiences(doc, "Start Date", LineHeight+40); // 385
+        textInRowFirstExperiences(doc, "End Date", LineHeight+60); // 405
+        textInRowFirstExperiences(doc, "Description", LineHeight+80); // 425
+        textInRowFirstExperiences(doc, "Area", LineHeight+100); // 445
+  
+        textInRowSecondExperiences(doc, experience[i].role, LineHeight); //345
+        textInRowSecondExperiences(doc, experience[i].company, LineHeight+20); //365
+        textInRowSecondExperiences(doc, experience[i].startDate, LineHeight+40); // 385
+        textInRowSecondExperiences(doc, experience[i].endDate, LineHeight+60); // 405
+        textInRowSecondExperiences(doc, experience[i].description, LineHeight+80); // 425
+        textInRowSecondExperiences(doc, experience[i].area, LineHeight+100); // 445  
+        
+        LineHeight = exLineHeight + (addSpace * (i+1))  
+        }
+      }
+      
       doc.end();
 
       writeStream.on("finish", function () {
