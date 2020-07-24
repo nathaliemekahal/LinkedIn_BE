@@ -134,16 +134,6 @@ profilesRouter.get("/:username/pdf", async (req, res, next) => {
       `attachment; filename=${profile.name}.pdf`
     );
 
-    // if (url.length > 0) {
-    //   const response = await axios.get(url, {
-    //     responseType: "arraybuffer",
-    //   });
-    //   const img = new Buffer(response.data, "base64");
-    //   doc.image(img, 88, 30, {
-    //     fit: [100, 100],
-    //   });
-    // }
-
     doc.font("Helvetica-Bold");
     doc.fontSize(18);
 
