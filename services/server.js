@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const postsRoutes = require("./posts");
 const experienceRoute = require("./experience");
+const commentRoutes = require("./comments");
 
 const server = express();
 const listEndpoints = require("express-list-endpoints");
@@ -23,6 +24,7 @@ server.use(cors());
 server.use("/posts", postsRoutes);
 server.use("/profile", experienceRoute);
 server.use("/profile", profilesRouter);
+server.use("/comments", commentRoutes);
 
 server.use(badRequestHandler);
 server.use(notFoundHandler);
@@ -33,7 +35,7 @@ console.log(listEndpoints(server));
 const url =
   "mongodb+srv://natman:feet@cluster0.z2kek.mongodb.net/Cluster0?retryWrites=true&w=majority";
 mongoose
-  .connect(url, {
+  .connect("mongodb://localhost:27017/LinkedIn", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
