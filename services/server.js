@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const postsRoutes = require("./posts");
 const experienceRoute = require("./experience");
+const commentRoutes = require("./comments");
 
 const server = express();
 const listEndpoints = require("express-list-endpoints");
@@ -23,6 +24,7 @@ server.use(cors());
 server.use("/posts", postsRoutes);
 server.use("/profile", experienceRoute);
 server.use("/profile", profilesRouter);
+server.use("/comments", commentRoutes);
 
 server.use(badRequestHandler);
 server.use(notFoundHandler);
