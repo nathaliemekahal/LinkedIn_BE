@@ -101,16 +101,6 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
     const newProfile = new ProfilesSchema(obj);
     await newProfile.save();
     res.send("ok");
-    /*
-        const newProfile = {
-            ...req.body,
-            "image": "https://i.dlpng.com/static/png/5326621-pingu-png-images-png-cliparts-free-download-on-seekpng-pingu-png-300_255_preview.png"
-        }
-        const rawNewProfile = new ProfilesSchema(newProfile)
-        const { id } = await rawNewProfile.save()
-        res.status(201).send(id)
-
-        */
   } catch (error) {
     next(error);
   }
@@ -129,7 +119,7 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
 
       var writeStream = fs.createWriteStream(`${profile.username}.pdf`);
       doc.pipe(writeStream);
-      //line to the middle
+      // Line to the middle
       doc.moveTo(270, 90).lineTo(270, 190).stroke();
 
       row(doc, 90);
