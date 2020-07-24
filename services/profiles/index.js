@@ -118,67 +118,126 @@ profilesRouter.get("/:username/pdf", async (req, res, next) => {
     });
     const getExp = await experienceModel.find({ username: profile.username });
     const doc = new pdfdocument();
-    const url =
-      "https://images.unsplash.com/photo-1533907650686-70576141c030?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=${profile.name}.pdf`
     );
 
-    doc.font("Helvetica-Bold");
-    doc.fontSize(18);
+    doc.image(profile.image, 15, 15, {width: 250, height: 270})
+    doc.text("PERSONAL INFORMATIONS", 350, 20)
+    doc.text("JOB EXPERIENCES", 230, 325 )
 
-    doc.text(`${profile.name} ${profile.surname}`, 100, 140, {
-      width: 410,
-      align: "center",
-    });
-    doc.fontSize(12);
-    doc.font("Helvetica");
-    doc.text(
-      `
+    // Rows for the user infos
+    row(doc, 40);
+    row(doc, 60);
+    row(doc, 80);
+    row(doc, 100);
+    row(doc, 120);
 
-    ${profile.area}
-    ${profile.email}`,
-      360,
-      180,
-      {
-        align: "left",
-      }
-    );
-    doc.fontSize(18);
-    doc.text("Experiences", 100, 270, {
-      width: 410,
-      align: "center",
-    });
-    doc.fontSize(12);
-    const start = async () => {
-      getExp.forEach(
-        async (exp) =>
-          doc.text(`
-          Role: ${exp.role}
-          Company: ${exp.company}
-          Starting Date: ${exp.startDate.toString().slice(4, 15)}
-          Description: ${exp.description}
-          Area:  ${exp.area}
-          -------------------------------------------------------
-        `),
-        {
-          width: 410,
-          align: "center",
-        }
-      );
-    };
-    await start();
+    // Rows for the user experiences
+    row(doc, 210) // Role
+    row(doc, 230) // Company
+    row(doc, 250) // Start Date
+    row(doc, 270) // End Date
+    row(doc, 290) // Description
+    row(doc, 310) // Area
 
-    let grad = doc.linearGradient(50, 0, 350, 100);
-    grad.stop(0, "#0077B5").stop(1, "#004451");
+    // Content of user infos
+    textInRowFirst(doc, "Name:", 40);
+    textInRowFirst(doc, "Surname:", 60);
+    textInRowFirst(doc, "Email:", 80);
+    textInRowFirst(doc, "Area:", 100);
+    textInRowFirst(doc, "Username:", 120);
+    textInRowFirst(doc, "Phone Number:", 140);
+    textInRowFirst(doc, "Nationality:", 160);
 
-    doc.rect(0, 0, 70, 1000);
-    doc.fill(grad);
+
+    textInRowSecond(doc, profile.name, 40);
+    textInRowSecond(doc, profile.surname, 60);
+    textInRowSecond(doc, profile.email, 80);
+    textInRowSecond(doc, profile.area, 100);
+    textInRowSecond(doc, profile.username, 120);
+    textInRowSecond(doc, "3504588976", 140);
+    textInRowSecond(doc, "German", 160);
+
+
+    // Content of user experiences
+    textInRowFirstExperiences(doc, "Role:", 345);
+    textInRowFirstExperiences(doc, "Company", 365);
+    textInRowFirstExperiences(doc, "Start Date", 385);
+    textInRowFirstExperiences(doc, "End Date", 405);
+    textInRowFirstExperiences(doc, "Description", 425);
+    textInRowFirstExperiences(doc, "Area", 445);
+
+    textInRowSecondExperiences(doc, experience[0].role, 345);
+    textInRowSecondExperiences(doc, experience[0].company, 365);
+    textInRowSecondExperiences(doc, experience[0].startDate, 385);
+    textInRowSecondExperiences(doc, experience[0].endDate, 405);
+    textInRowSecondExperiences(doc, experience[0].description, 425);
+    textInRowSecondExperiences(doc, experience[0].area, 445);
 
     doc.pipe(res);
 
     doc.end();
+
+    // Function for user infos
+    function textInRowFirst(doc, text, heigth) {
+      doc.y = heigth;
+      doc.x = 275;
+      doc.fillColor("black");
+      doc.text(text, {
+        paragraphGap: 5,
+        indent: 5,
+        align: "justify",
+        columns: 1,
+      });
+      return doc;
+    }
+
+    function textInRowSecond(doc, text, heigth) {
+      doc.y = heigth;
+      doc.x = 375;
+      doc.fillColor("black");
+      doc.text(text, {
+        paragraphGap: 5,
+        indent: 5,
+        align: "justify",
+        columns: 1,
+      });
+      return doc;
+    }
+
+    // Function for user experiences
+    function textInRowFirstExperiences(doc, text, heigth) {
+      doc.y = heigth;
+      doc.x = 15;
+      doc.fillColor("black");
+      doc.text(text, {
+        paragraphGap: 5,
+        indent: 5,
+        align: "justify",
+        columns: 1,
+      });
+      return doc;
+    }
+
+    function textInRowSecondExperiences(doc, text, heigth) {
+      doc.y = heigth;
+      doc.x = 120;
+      doc.fillColor("black");
+      doc.text(text, {
+        paragraphGap: 5,
+        indent: 5,
+        align: "justify",
+        columns: 1,
+      });
+      return doc;
+    }
+
+     function row(doc, heigth) {
+      doc.lineJoin("miter").rect(30, heigth, 500, 20);
+      return doc;
+    } 
   } catch (error) {
     next(error);
   }
