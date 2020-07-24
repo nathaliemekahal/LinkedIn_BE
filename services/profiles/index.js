@@ -1,11 +1,14 @@
 const express = require("express");
 const ProfilesSchema = require("./schema");
 const profilesRouter = express.Router();
+const experienceModel = require("../experience/schema");
 const multer = require("multer");
 const fs = require("fs-extra");
 const path = require("path");
 const upload = multer({});
-const PDFDocument = require("pdfkit");
+const pdfdocument = require("pdfkit");
+const pump = require("pump");
+const axios = require("axios");
 
 // Get all profiles
 profilesRouter.get("/", async (req, res, next) => {
@@ -117,90 +120,88 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
 });
 
 // Create a PDF file of a profile
-profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
+profilesRouter.get("/:username/pdf", async (req, res, next) => {
   try {
-    console.log("here");
-    const id = req.params.id;
-    const profile = await ProfilesSchema.findById(id);
+    const profile = await ProfilesSchema.findOne({
+      username: req.params.username,
+    });
+    const getExp = await experienceModel.find({ username: profile.username });
+    const doc = new pdfdocument();
+    const url =
+      "https://images.unsplash.com/photo-1533907650686-70576141c030?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${profile.name}.pdf`
+    );
 
-    console.log(profile);
-    function example() {
-      var doc = new PDFDocument();
+    // if (url.length > 0) {
+    //   const response = await axios.get(url, {
+    //     responseType: "arraybuffer",
+    //   });
+    //   const img = new Buffer(response.data, "base64");
+    //   doc.image(img, 88, 30, {
+    //     fit: [100, 100],
+    //   });
+    // }
 
-      var writeStream = fs.createWriteStream(`${profile.username}.pdf`);
-      doc.pipe(writeStream);
-      //line to the middle
-      doc.moveTo(270, 90).lineTo(270, 190).stroke();
+    doc.font("Helvetica-Bold");
+    doc.fontSize(18);
 
-      row(doc, 90);
-      row(doc, 110);
-      row(doc, 130);
-      row(doc, 150);
-      row(doc, 170);
+    doc.text(`${profile.name} ${profile.surname}`, 100, 140, {
+      width: 410,
+      align: "center",
+    });
+    doc.fontSize(12);
+    doc.font("Helvetica");
+    doc.text(
+      `
 
-      textInRowFirst(doc, "Name:", 100);
-      textInRowFirst(doc, "Surname", 120);
-      textInRowFirst(doc, "Email", 140);
-      textInRowFirst(doc, "Area", 160);
-      textInRowFirst(doc, "Username", 180);
+    ${profile.area}
+    ${profile.email}`,
+      360,
+      180,
+      {
+        align: "left",
+      }
+    );
+    doc.fontSize(18);
+    doc.text("Experiences", 100, 270, {
+      width: 410,
+      align: "center",
+    });
+    doc.fontSize(12);
+    const start = async () => {
+      getExp.forEach(
+        async (exp) =>
+          doc.text(`
+          Role: ${exp.role}
+          Company: ${exp.company}
+          Starting Date: ${exp.startDate.toString().slice(4, 15)}
+          Description: ${exp.description}
+          Area:  ${exp.area}
+          -------------------------------------------------------
+        `),
+        {
+          width: 410,
+          align: "center",
+        }
+      );
+    };
+    await start();
 
-      textInRowSecond(doc, profile.name, 100);
-      textInRowSecond(doc, profile.surname, 120);
-      textInRowSecond(doc, profile.email, 140);
-      textInRowSecond(doc, profile.area, 160);
-      textInRowSecond(doc, profile.username, 180);
-      doc.end();
+    let grad = doc.linearGradient(50, 0, 350, 100);
+    grad.stop(0, "#0077B5").stop(1, "#004451");
 
-      writeStream.on("finish", function () {
-        res.setHeader("Content-Disposition", "attachment; filename=export.csv");
-        pump(jsonReadableStream, json2csv, res, (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Done");
-          }
-        });
-      });
-    }
+    doc.rect(0, 0, 70, 1000);
+    doc.fill(grad);
 
-    function textInRowFirst(doc, text, heigth) {
-      doc.y = heigth;
-      doc.x = 30;
-      doc.fillColor("black");
-      doc.text(text, {
-        paragraphGap: 5,
-        indent: 5,
-        align: "justify",
-        columns: 1,
-      });
-      return doc;
-    }
+    doc.pipe(res);
 
-    function textInRowSecond(doc, text, heigth) {
-      doc.y = heigth;
-      doc.x = 270;
-      doc.fillColor("black");
-      doc.text(text, {
-        paragraphGap: 5,
-        indent: 5,
-        align: "justify",
-        columns: 1,
-      });
-      return doc;
-    }
-
-    function row(doc, heigth) {
-      doc.lineJoin("miter").rect(30, heigth, 500, 20).stroke();
-      return doc;
-    }
-
-    example();
+    doc.end();
   } catch (error) {
-    console.log(error);
-    next("While reading profiles list a problem occurred!");
+    next(error);
   }
 });
-
 // Modifie a profile
 profilesRouter.put("/:id", async (req, res, next) => {
   try {
