@@ -116,10 +116,10 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
     // Getting user infos
     const id = req.params.id;
     const profile = await ProfilesSchema.findById(id);
-    console.log(profile)
     // Getting user experiences
     const experience = await ExperienceSchema.find({username: profile.username})
-    console.log(experience[0].role)
+    
+    console.log(profile.image)
 
     res.setHeader(
       "Content-Disposition",
@@ -128,9 +128,6 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
 
     function example() {
       var doc = new PDFDocument();
-      // Line to the middle
-      // doc.moveTo(270, 90).lineTo(270, 190).stroke();
-      // doc.moveTo(270, 210).lineTo(270, 330).stroke()
 
       doc.image(profile.image, 15, 15, {width: 250, height: 270})
       doc.text("PERSONAL INFORMATIONS", 350, 20)
@@ -198,14 +195,15 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       }
       doc.pipe(res);
       doc.end();
-
-      writeStream.on("finish", function () {
+      doc.on("finish", function () {
         // do stuff with the PDF file
         return res.status(200).json({
           ok: "ok",
         });
       });
     }
+
+      
     // Function for user infos
     function textInRowFirst(doc, text, heigth) {
       doc.y = heigth;
