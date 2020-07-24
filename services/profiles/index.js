@@ -7,7 +7,7 @@ const multer = require("multer");
 const fs = require("fs-extra");
 const path = require("path");
 const upload = multer({});
-const pdfdocument = require("pdfkit");
+const PDFDocument = require("pdfkit");
 const pump = require("pump");
 const axios = require("axios");
 
@@ -111,75 +111,86 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
 });
 
 // Create a PDF file of a profile
-profilesRouter.get("/:username/pdf", async (req, res, next) => {
+profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
   try {
-    const profile = await ProfilesSchema.findOne({
-      username: req.params.username,
-    });
-    const getExp = await experienceModel.find({ username: profile.username });
-    const doc = new pdfdocument();
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${profile.name}.pdf`
-    );
+    // Getting user infos
+    const id = req.params.id;
+    const profile = await ProfilesSchema.findById(id);
+    console.log(profile)
+    // Getting user experiences
+    const experience = await ExperienceSchema.find({username: profile.username})
+    console.log(experience[0].role)
 
-    doc.image(profile.image, 15, 15, {width: 250, height: 270})
-    doc.text("PERSONAL INFORMATIONS", 350, 20)
-    doc.text("JOB EXPERIENCES", 230, 325 )
+    function example() {
+      var doc = new PDFDocument();
 
-    // Rows for the user infos
-    row(doc, 40);
-    row(doc, 60);
-    row(doc, 80);
-    row(doc, 100);
-    row(doc, 120);
+      var writeStream = fs.createWriteStream(`${profile.name}_${profile.surname}_CV.pdf`);
+      doc.pipe(writeStream);
+      // Line to the middle
+      // doc.moveTo(270, 90).lineTo(270, 190).stroke();
+      // doc.moveTo(270, 210).lineTo(270, 330).stroke()
 
-    // Rows for the user experiences
-    row(doc, 210) // Role
-    row(doc, 230) // Company
-    row(doc, 250) // Start Date
-    row(doc, 270) // End Date
-    row(doc, 290) // Description
-    row(doc, 310) // Area
+      doc.image(profile.image, 15, 15, {width: 250, height: 270})
+      doc.text("PERSONAL INFORMATIONS", 350, 20)
+      doc.text("JOB EXPERIENCES", 230, 325 )
 
-    // Content of user infos
-    textInRowFirst(doc, "Name:", 40);
-    textInRowFirst(doc, "Surname:", 60);
-    textInRowFirst(doc, "Email:", 80);
-    textInRowFirst(doc, "Area:", 100);
-    textInRowFirst(doc, "Username:", 120);
-    textInRowFirst(doc, "Phone Number:", 140);
-    textInRowFirst(doc, "Nationality:", 160);
+      // Rows for the user infos
+      row(doc, 40);
+      row(doc, 60);
+      row(doc, 80);
+      row(doc, 100);
+      row(doc, 120);
 
+      // Rows for the user experiences
+      row(doc, 210) // Role
+      row(doc, 230) // Company
+      row(doc, 250) // Start Date
+      row(doc, 270) // End Date
+      row(doc, 290) // Description
+      row(doc, 310) // Area
 
-    textInRowSecond(doc, profile.name, 40);
-    textInRowSecond(doc, profile.surname, 60);
-    textInRowSecond(doc, profile.email, 80);
-    textInRowSecond(doc, profile.area, 100);
-    textInRowSecond(doc, profile.username, 120);
-    textInRowSecond(doc, "3504588976", 140);
-    textInRowSecond(doc, "German", 160);
+      // Content of user infos
+      textInRowFirst(doc, "Name:", 40);
+      textInRowFirst(doc, "Surname:", 60);
+      textInRowFirst(doc, "Email:", 80);
+      textInRowFirst(doc, "Area:", 100);
+      textInRowFirst(doc, "Username:", 120);
+      textInRowFirst(doc, "Phone Number:", 140);
+      textInRowFirst(doc, "Nationality:", 160);
 
 
-    // Content of user experiences
-    textInRowFirstExperiences(doc, "Role:", 345);
-    textInRowFirstExperiences(doc, "Company", 365);
-    textInRowFirstExperiences(doc, "Start Date", 385);
-    textInRowFirstExperiences(doc, "End Date", 405);
-    textInRowFirstExperiences(doc, "Description", 425);
-    textInRowFirstExperiences(doc, "Area", 445);
+      textInRowSecond(doc, profile.name, 40);
+      textInRowSecond(doc, profile.surname, 60);
+      textInRowSecond(doc, profile.email, 80);
+      textInRowSecond(doc, profile.area, 100);
+      textInRowSecond(doc, profile.username, 120);
+      textInRowSecond(doc, "3504588976", 140);
+      textInRowSecond(doc, "German", 160);
 
-    textInRowSecondExperiences(doc, experience[0].role, 345);
-    textInRowSecondExperiences(doc, experience[0].company, 365);
-    textInRowSecondExperiences(doc, experience[0].startDate, 385);
-    textInRowSecondExperiences(doc, experience[0].endDate, 405);
-    textInRowSecondExperiences(doc, experience[0].description, 425);
-    textInRowSecondExperiences(doc, experience[0].area, 445);
 
-    doc.pipe(res);
+      // Content of user experiences
+      textInRowFirstExperiences(doc, "Role:", 345);
+      textInRowFirstExperiences(doc, "Company", 365);
+      textInRowFirstExperiences(doc, "Start Date", 385);
+      textInRowFirstExperiences(doc, "End Date", 405);
+      textInRowFirstExperiences(doc, "Description", 425);
+      textInRowFirstExperiences(doc, "Area", 445);
 
-    doc.end();
+      textInRowSecondExperiences(doc, experience[0].role, 345);
+      textInRowSecondExperiences(doc, experience[0].company, 365);
+      textInRowSecondExperiences(doc, experience[0].startDate, 385);
+      textInRowSecondExperiences(doc, experience[0].endDate, 405);
+      textInRowSecondExperiences(doc, experience[0].description, 425);
+      textInRowSecondExperiences(doc, experience[0].area, 445);
+      doc.end();
 
+      writeStream.on("finish", function () {
+        // do stuff with the PDF file
+        return res.status(200).json({
+          ok: "ok",
+        });
+      });
+    }
     // Function for user infos
     function textInRowFirst(doc, text, heigth) {
       doc.y = heigth;
@@ -238,10 +249,15 @@ profilesRouter.get("/:username/pdf", async (req, res, next) => {
       doc.lineJoin("miter").rect(30, heigth, 500, 20);
       return doc;
     } 
+
+    example();
   } catch (error) {
-    next(error);
+    console.log(error);
+    next("While reading profiles list a problem occurred!");
   }
 });
+
+
 // Modifie a profile
 profilesRouter.put("/:id", async (req, res, next) => {
   try {
