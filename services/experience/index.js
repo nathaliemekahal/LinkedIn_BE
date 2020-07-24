@@ -119,8 +119,7 @@ experienceRoute.put("/:userName/experience/:id", async (req, res) => {
     { username: req.params.userName, _id: req.params.id },
     {
       ...req.body,
-    },
-    { runValidators: true }
+    }
   );
   if (experience) {
     res.send("UPDATED");
