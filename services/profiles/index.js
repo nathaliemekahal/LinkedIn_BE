@@ -21,7 +21,7 @@ profilesRouter.get("/", async (req, res, next) => {
 profilesRouter.get("/:username", async (req, res, next) => {
   try {
     const username = req.params.username;
-    const profile = await ProfilesSchema.find({username: username});
+    const profile = await ProfilesSchema.find({ username: username });
     if (profile) {
       res.status(200).send(profile);
     } else {
@@ -152,9 +152,13 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       doc.end();
 
       writeStream.on("finish", function () {
-        // do stuff with the PDF file
-        return res.status(200).json({
-          ok: "ok",
+        res.setHeader("Content-Disposition", "attachment; filename=export.csv");
+        pump(jsonReadableStream, json2csv, res, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Done");
+          }
         });
       });
     }
