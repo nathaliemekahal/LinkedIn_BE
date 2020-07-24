@@ -162,26 +162,31 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       textInRowSecond(doc, profile.area, 100);
       textInRowSecond(doc, profile.username, 120);
       textInRowSecond(doc, "3504588976", 140);
-      textInRowSecond(doc, "German", 160);
-
-      const exLineHeight = 345
-
-      for(let i=0; i<experience.length; i++){  
+      textInRowSecond(doc, "German", 160); 
         // Content of user experiences
-      
-      textInRowFirstExperiences(doc, "Role:", exLineHeight); //345
-      textInRowFirstExperiences(doc, "Company", exLineHeight+20); //365
-      textInRowFirstExperiences(doc, "Start Date", exLineHeight+40); // 385
-      textInRowFirstExperiences(doc, "End Date", exLineHeight+60); // 405
-      textInRowFirstExperiences(doc, "Description", exLineHeight+80); // 425
-      textInRowFirstExperiences(doc, "Area", exLineHeight+100); // 445
+        
+        const addSpace = 160        
+        const exLineHeight = 345       
 
-      textInRowSecondExperiences(doc, experience[i].role, exLineHeight); //345
-      textInRowSecondExperiences(doc, experience[i].company, exLineHeight+20); //365
-      textInRowSecondExperiences(doc, experience[i].startDate, exLineHeight+40); // 385
-      textInRowSecondExperiences(doc, experience[i].endDate, exLineHeight+60); // 405
-      textInRowSecondExperiences(doc, experience[i].description, exLineHeight+80); // 425
-      textInRowSecondExperiences(doc, experience[i].area, exLineHeight+100); // 445     
+      for(let i=0; i<experience.length; i++){
+
+        doc.text("Experience number " + (i+1), 15, exLineHeight)
+
+        textInRowFirstExperiences(doc, "Role:", exLineHeight+30);
+        textInRowFirstExperiences(doc, "Company", exLineHeight+50);
+        textInRowFirstExperiences(doc, "Start Date", exLineHeight+70);
+        textInRowFirstExperiences(doc, "End Date", exLineHeight+90);
+        textInRowFirstExperiences(doc, "Description", exLineHeight+110);
+        textInRowFirstExperiences(doc, "Area", exLineHeight+130);
+
+        textInRowSecondExperiences(doc, experience[i].role, exLineHeight+30);
+        textInRowSecondExperiences(doc, experience[i].company, exLineHeight+50);
+        textInRowSecondExperiences(doc, experience[i].startDate, exLineHeight+70);
+        textInRowSecondExperiences(doc, experience[i].endDate, exLineHeight+90);
+        textInRowSecondExperiences(doc, experience[i].description, exLineHeight+110);
+        textInRowSecondExperiences(doc, experience[i].area, exLineHeight+130);
+
+        exLineHeight = exLineHeight + ((i+1)*addSpace)   
       }
 
       
