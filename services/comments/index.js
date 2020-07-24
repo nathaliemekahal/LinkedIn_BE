@@ -44,7 +44,7 @@ router.put("/:id", async (req, res) => {
 //DELETE
 
 router.delete("/:id", async (req, res) => {
-  await postModel.findByIdAndDelete(req.params.id);
+  await commentModel.findByIdAndDelete(req.params.id);
   res.send("Deleted sucessfully");
 });
 
