@@ -1,11 +1,13 @@
 const express = require("express");
 const ProfilesSchema = require("./schema");
+const ExperienceSchema = require("../experience/schema")
 const profilesRouter = express.Router();
 const multer = require("multer");
 const fs = require("fs-extra");
 const path = require("path");
 const upload = multer({});
 const PDFDocument = require("pdfkit");
+const { response } = require("express");
 
 // Get all profiles
 profilesRouter.get("/", async (req, res, next) => {
@@ -109,36 +111,75 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
 // Create a PDF file of a profile
 profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
   try {
-    console.log("here");
+    // Getting user infos
     const id = req.params.id;
     const profile = await ProfilesSchema.findById(id);
+    console.log(profile)
+    // Getting user experiences
+    const experience = await ExperienceSchema.find({username: profile.username})
+    console.log(experience[0].role)
 
-    console.log(profile);
     function example() {
       var doc = new PDFDocument();
 
-      var writeStream = fs.createWriteStream(`${profile.username}.pdf`);
+      var writeStream = fs.createWriteStream(`${profile.name}_${profile.surname}_CV.pdf`);
       doc.pipe(writeStream);
       // Line to the middle
-      doc.moveTo(270, 90).lineTo(270, 190).stroke();
+      // doc.moveTo(270, 90).lineTo(270, 190).stroke();
+      // doc.moveTo(270, 210).lineTo(270, 330).stroke()
 
-      row(doc, 90);
-      row(doc, 110);
-      row(doc, 130);
-      row(doc, 150);
-      row(doc, 170);
+      doc.image(profile.image, 15, 15, {width: 250, height: 270})
+      doc.text("PERSONAL INFORMATIONS", 350, 20)
+      doc.text("JOB EXPERIENCES", 230, 325 )
 
-      textInRowFirst(doc, "Name:", 100);
-      textInRowFirst(doc, "Surname", 120);
-      textInRowFirst(doc, "Email", 140);
-      textInRowFirst(doc, "Area", 160);
-      textInRowFirst(doc, "Username", 180);
+      // Rows for the user infos
+      row(doc, 40);
+      row(doc, 60);
+      row(doc, 80);
+      row(doc, 100);
+      row(doc, 120);
 
-      textInRowSecond(doc, profile.name, 100);
-      textInRowSecond(doc, profile.surname, 120);
-      textInRowSecond(doc, profile.email, 140);
-      textInRowSecond(doc, profile.area, 160);
-      textInRowSecond(doc, profile.username, 180);
+      // Rows for the user experiences
+      row(doc, 210) // Role
+      row(doc, 230) // Company
+      row(doc, 250) // Start Date
+      row(doc, 270) // End Date
+      row(doc, 290) // Description
+      row(doc, 310) // Area
+
+      // Content of user infos
+      textInRowFirst(doc, "Name:", 40);
+      textInRowFirst(doc, "Surname:", 60);
+      textInRowFirst(doc, "Email:", 80);
+      textInRowFirst(doc, "Area:", 100);
+      textInRowFirst(doc, "Username:", 120);
+      textInRowFirst(doc, "Phone Number:", 140);
+      textInRowFirst(doc, "Nationality:", 160);
+
+
+      textInRowSecond(doc, profile.name, 40);
+      textInRowSecond(doc, profile.surname, 60);
+      textInRowSecond(doc, profile.email, 80);
+      textInRowSecond(doc, profile.area, 100);
+      textInRowSecond(doc, profile.username, 120);
+      textInRowSecond(doc, "3504588976", 140);
+      textInRowSecond(doc, "German", 160);
+
+
+      // Content of user experiences
+      textInRowFirstExperiences(doc, "Role:", 345);
+      textInRowFirstExperiences(doc, "Company", 365);
+      textInRowFirstExperiences(doc, "Start Date", 385);
+      textInRowFirstExperiences(doc, "End Date", 405);
+      textInRowFirstExperiences(doc, "Description", 425);
+      textInRowFirstExperiences(doc, "Area", 445);
+
+      textInRowSecondExperiences(doc, experience[0].role, 345);
+      textInRowSecondExperiences(doc, experience[0].company, 365);
+      textInRowSecondExperiences(doc, experience[0].startDate, 385);
+      textInRowSecondExperiences(doc, experience[0].endDate, 405);
+      textInRowSecondExperiences(doc, experience[0].description, 425);
+      textInRowSecondExperiences(doc, experience[0].area, 445);
       doc.end();
 
       writeStream.on("finish", function () {
@@ -148,10 +189,10 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
         });
       });
     }
-
+    // Function for user infos
     function textInRowFirst(doc, text, heigth) {
       doc.y = heigth;
-      doc.x = 30;
+      doc.x = 275;
       doc.fillColor("black");
       doc.text(text, {
         paragraphGap: 5,
@@ -164,7 +205,7 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
 
     function textInRowSecond(doc, text, heigth) {
       doc.y = heigth;
-      doc.x = 270;
+      doc.x = 375;
       doc.fillColor("black");
       doc.text(text, {
         paragraphGap: 5,
@@ -175,10 +216,37 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       return doc;
     }
 
-    function row(doc, heigth) {
-      doc.lineJoin("miter").rect(30, heigth, 500, 20).stroke();
+    // Function for user experiences
+    function textInRowFirstExperiences(doc, text, heigth) {
+      doc.y = heigth;
+      doc.x = 15;
+      doc.fillColor("black");
+      doc.text(text, {
+        paragraphGap: 5,
+        indent: 5,
+        align: "justify",
+        columns: 1,
+      });
       return doc;
     }
+
+    function textInRowSecondExperiences(doc, text, heigth) {
+      doc.y = heigth;
+      doc.x = 120;
+      doc.fillColor("black");
+      doc.text(text, {
+        paragraphGap: 5,
+        indent: 5,
+        align: "justify",
+        columns: 1,
+      });
+      return doc;
+    }
+
+     function row(doc, heigth) {
+      doc.lineJoin("miter").rect(30, heigth, 500, 20);
+      return doc;
+    } 
 
     example();
   } catch (error) {
