@@ -121,11 +121,13 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
     const experience = await ExperienceSchema.find({username: profile.username})
     console.log(experience[0].role)
 
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${profile.name}.pdf`
+    );
+
     function example() {
       var doc = new PDFDocument();
-
-      var writeStream = fs.createWriteStream(`${profile.name}_${profile.surname}_CV.pdf`);
-      doc.pipe(writeStream);
       // Line to the middle
       // doc.moveTo(270, 90).lineTo(270, 190).stroke();
       // doc.moveTo(270, 210).lineTo(270, 330).stroke()
@@ -194,7 +196,7 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
         LineHeight = exLineHeight + (addSpace * (i+1))  
         }
       }
-      
+      doc.pipe(res);
       doc.end();
 
       writeStream.on("finish", function () {
