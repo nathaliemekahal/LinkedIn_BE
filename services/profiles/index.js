@@ -117,7 +117,6 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
     console.log(profile)
     // Getting user experiences
     const experience = await ExperienceSchema.find({username: profile.username})
-    console.log(experience[0].role)
 
     function example() {
       var doc = new PDFDocument();
@@ -165,21 +164,27 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       textInRowSecond(doc, "3504588976", 140);
       textInRowSecond(doc, "German", 160);
 
+      const exLineHeight = 345
 
-      // Content of user experiences
-      textInRowFirstExperiences(doc, "Role:", 345);
-      textInRowFirstExperiences(doc, "Company", 365);
-      textInRowFirstExperiences(doc, "Start Date", 385);
-      textInRowFirstExperiences(doc, "End Date", 405);
-      textInRowFirstExperiences(doc, "Description", 425);
-      textInRowFirstExperiences(doc, "Area", 445);
+      for(let i=0; i<experience.length; i++){  
+        // Content of user experiences
+      
+      textInRowFirstExperiences(doc, "Role:", exLineHeight); //345
+      textInRowFirstExperiences(doc, "Company", exLineHeight+20); //365
+      textInRowFirstExperiences(doc, "Start Date", exLineHeight+40); // 385
+      textInRowFirstExperiences(doc, "End Date", exLineHeight+60); // 405
+      textInRowFirstExperiences(doc, "Description", exLineHeight+80); // 425
+      textInRowFirstExperiences(doc, "Area", exLineHeight+100); // 445
 
-      textInRowSecondExperiences(doc, experience[0].role, 345);
-      textInRowSecondExperiences(doc, experience[0].company, 365);
-      textInRowSecondExperiences(doc, experience[0].startDate, 385);
-      textInRowSecondExperiences(doc, experience[0].endDate, 405);
-      textInRowSecondExperiences(doc, experience[0].description, 425);
-      textInRowSecondExperiences(doc, experience[0].area, 445);
+      textInRowSecondExperiences(doc, experience[i].role, exLineHeight); //345
+      textInRowSecondExperiences(doc, experience[i].company, exLineHeight+20); //365
+      textInRowSecondExperiences(doc, experience[i].startDate, exLineHeight+40); // 385
+      textInRowSecondExperiences(doc, experience[i].endDate, exLineHeight+60); // 405
+      textInRowSecondExperiences(doc, experience[i].description, exLineHeight+80); // 425
+      textInRowSecondExperiences(doc, experience[i].area, exLineHeight+100); // 445     
+      }
+
+      
       doc.end();
 
       writeStream.on("finish", function () {
