@@ -1,12 +1,13 @@
 const express = require("express");
 const ProfilesSchema = require("./schema");
+const ExperienceSchema = require("../experience/schema")
 const profilesRouter = express.Router();
 const experienceModel = require("../experience/schema");
 const multer = require("multer");
 const fs = require("fs-extra");
 const path = require("path");
 const upload = multer({});
-const pdfdocument = require("pdfkit");
+const PDFDocument = require("pdfkit");
 const pump = require("pump");
 const axios = require("axios");
 
@@ -104,16 +105,6 @@ profilesRouter.post("/", upload.single("image"), async (req, res, next) => {
     const newProfile = new ProfilesSchema(obj);
     await newProfile.save();
     res.send("ok");
-    /*
-        const newProfile = {
-            ...req.body,
-            "image": "https://i.dlpng.com/static/png/5326621-pingu-png-images-png-cliparts-free-download-on-seekpng-pingu-png-300_255_preview.png"
-        }
-        const rawNewProfile = new ProfilesSchema(newProfile)
-        const { id } = await rawNewProfile.save()
-        res.status(201).send(id)
-
-        */
   } catch (error) {
     next(error);
   }
@@ -125,26 +116,23 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
     // Getting user infos
     const id = req.params.id;
     const profile = await ProfilesSchema.findById(id);
-    console.log(profile);
+    console.log(profile)
     // Getting user experiences
-    const experience = await ExperienceSchema.find({
-      username: profile.username,
-    });
+    const experience = await ExperienceSchema.find({username: profile.username})
+    console.log(experience[0].role)
 
     function example() {
       var doc = new PDFDocument();
 
-      var writeStream = fs.createWriteStream(
-        `${profile.name}_${profile.surname}_CV.pdf`
-      );
+      var writeStream = fs.createWriteStream(`${profile.name}_${profile.surname}_CV.pdf`);
       doc.pipe(writeStream);
       // Line to the middle
       // doc.moveTo(270, 90).lineTo(270, 190).stroke();
       // doc.moveTo(270, 210).lineTo(270, 330).stroke()
 
-      doc.image(profile.image, 15, 15, { width: 250, height: 270 });
-      doc.text("PERSONAL INFORMATIONS", 350, 20);
-      doc.text("JOB EXPERIENCES", 230, 325);
+      doc.image(profile.image, 15, 15, {width: 250, height: 270})
+      doc.text("PERSONAL INFORMATIONS", 350, 20)
+      doc.text("JOB EXPERIENCES", 230, 325 )
 
       // Rows for the user infos
       row(doc, 40);
@@ -154,12 +142,12 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       row(doc, 120);
 
       // Rows for the user experiences
-      row(doc, 210); // Role
-      row(doc, 230); // Company
-      row(doc, 250); // Start Date
-      row(doc, 270); // End Date
-      row(doc, 290); // Description
-      row(doc, 310); // Area
+      row(doc, 210) // Role
+      row(doc, 230) // Company
+      row(doc, 250) // Start Date
+      row(doc, 270) // End Date
+      row(doc, 290) // Description
+      row(doc, 310) // Area
 
       // Content of user infos
       textInRowFirst(doc, "Name:", 40);
@@ -170,6 +158,7 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       textInRowFirst(doc, "Phone Number:", 140);
       textInRowFirst(doc, "Nationality:", 160);
 
+
       textInRowSecond(doc, profile.name, 40);
       textInRowSecond(doc, profile.surname, 60);
       textInRowSecond(doc, profile.email, 80);
@@ -178,42 +167,21 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       textInRowSecond(doc, "3504588976", 140);
       textInRowSecond(doc, "German", 160);
 
-      const exLineHeight = 345;
 
-      for (let i = 0; i < experience.length; i++) {
-        // Content of user experiences
+      // Content of user experiences
+      textInRowFirstExperiences(doc, "Role:", 345);
+      textInRowFirstExperiences(doc, "Company", 365);
+      textInRowFirstExperiences(doc, "Start Date", 385);
+      textInRowFirstExperiences(doc, "End Date", 405);
+      textInRowFirstExperiences(doc, "Description", 425);
+      textInRowFirstExperiences(doc, "Area", 445);
 
-        textInRowFirstExperiences(doc, "Role:", exLineHeight); //345
-        textInRowFirstExperiences(doc, "Company", exLineHeight + 20); //365
-        textInRowFirstExperiences(doc, "Start Date", exLineHeight + 40); // 385
-        textInRowFirstExperiences(doc, "End Date", exLineHeight + 60); // 405
-        textInRowFirstExperiences(doc, "Description", exLineHeight + 80); // 425
-        textInRowFirstExperiences(doc, "Area", exLineHeight + 100); // 445
-
-        textInRowSecondExperiences(doc, experience[i].role, exLineHeight); //345
-        textInRowSecondExperiences(
-          doc,
-          experience[i].company,
-          exLineHeight + 20
-        ); //365
-        textInRowSecondExperiences(
-          doc,
-          experience[i].startDate,
-          exLineHeight + 40
-        ); // 385
-        textInRowSecondExperiences(
-          doc,
-          experience[i].endDate,
-          exLineHeight + 60
-        ); // 405
-        textInRowSecondExperiences(
-          doc,
-          experience[i].description,
-          exLineHeight + 80
-        ); // 425
-        textInRowSecondExperiences(doc, experience[i].area, exLineHeight + 100); // 445
-      }
-
+      textInRowSecondExperiences(doc, experience[0].role, 345);
+      textInRowSecondExperiences(doc, experience[0].company, 365);
+      textInRowSecondExperiences(doc, experience[0].startDate, 385);
+      textInRowSecondExperiences(doc, experience[0].endDate, 405);
+      textInRowSecondExperiences(doc, experience[0].description, 425);
+      textInRowSecondExperiences(doc, experience[0].area, 445);
       doc.end();
 
       writeStream.on("finish", function () {
@@ -277,10 +245,10 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
       return doc;
     }
 
-    function row(doc, heigth) {
+     function row(doc, heigth) {
       doc.lineJoin("miter").rect(30, heigth, 500, 20);
       return doc;
-    }
+    } 
 
     example();
   } catch (error) {
@@ -289,24 +257,7 @@ profilesRouter.get("/:id/profilePDF", async (req, res, next) => {
   }
 });
 
-// Modifie a profile
-profilesRouter.put("/:id", async (req, res, next) => {
-  try {
-    const profile = await ProfilesSchema.findOneAndUpdate(
-      req.params.id,
-      req.body
-    );
-    if (profile) {
-      res.status(200).send("OK");
-    } else {
-      const error = new Error(`Profile with id ${req.params.id} not found!`);
-      error.httpStatusCode = 404;
-      next(error);
-    }
-  } catch (error) {
-    next(error);
-  }
-});
+
 // Modifie a profile
 profilesRouter.put("/:id", async (req, res, next) => {
   try {
